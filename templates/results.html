@@ -1,0 +1,45 @@
+{% extends 'layout.html' %} {% block head %}
+<title>Toxic Comment Classifier</title>
+<style>
+  .h-title {
+    text-align: center;
+    margin-top: 10rem;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div class="container w-50">
+  <h3 class="h-title">Is your comment toxic?</h3>
+  <textarea class="form-control my-3" rows="4" readonly>{{ text }}</textarea>
+  <br />
+  <div class="container">
+    <table class="table table-bordered table-striped table-hover">
+      <tr>
+        <th colspan="2" class="text-center">RFC Results</th>
+        <th colspan="2" class="text-center">LSTM Results</th>
+      </tr>
+      <tr>
+        <td>Severe Toxic</td>
+        <td>{{ score.2 }}%</td>
+        <td>Severe Toxic</td>
+        <td>{{ score.5 }}%</td>
+      </tr>
+      <tr>
+        <td>Moderate Toxic</td>
+        <td>{{ score.1 }}%</td>
+        <td>Moderate Toxic</td>
+        <td>{{ score.4 }}%</td>
+      </tr>
+      <tr>
+        <td>Mild Toxic</td>
+        <td>{{ score.0 }}%</td>
+        <td>Mild Toxic</td>
+        <td>{{ score.3 }}%</td>
+      </tr>
+    </table>
+  </div>
+  <br />
+  <a href="/reset" class="btn btn-primary">Reset</a>
+</div>
+
+{% endblock %}

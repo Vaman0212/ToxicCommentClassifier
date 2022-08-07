@@ -1,0 +1,25 @@
+{% extends 'layout.html' %} {% block head %}
+<title>Toxic Comment Classifier</title>
+<style>
+  .h-title {
+    text-align: center;
+    margin-top: 10rem;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div class="container w-50">
+  <h3 class="h-title">Is your comment toxic?</h3>
+  <form action="/results" method="post">
+    <textarea
+      class="form-control my-3"
+      rows="4"
+      name="comment"
+      placeholder="Enter your hindi comment"
+      required
+    ></textarea>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+{% endblock %}
