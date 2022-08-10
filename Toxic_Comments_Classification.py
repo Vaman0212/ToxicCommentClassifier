@@ -13,7 +13,7 @@ import stanfordnlp
 nlp = stanfordnlp.Pipeline(processors='tokenize,lemma',lang="hi")
 
 # Dataset import
-df = pd.read_csv('TrainDataset.csv')
+df = pd.read_csv('CommentsDataset.csv')
 df
 
 # Data Pre-Processing
@@ -112,9 +112,12 @@ vectorizer = CountVectorizer(min_df=2,ngram_range=(1,3),encoding='ISCII',tokeniz
 Xcv_train = vectorizer.fit_transform(df_train['sentence']).toarray()
 Xcv_test = vectorizer.transform(df_test['sentence'])
 
+# Saving TFIDF Vectorizer
+pickle.dump(tfidf, open('tfidf.pkl', 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
 
 # Random Forest Classifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 Rf = RandomForestClassifier(n_estimators=40,random_state=1,n_jobs=1)
 categories = ['toxic','severe_toxic','obscene','threat','insult','identity_hate']
 for l in categories:
@@ -167,101 +170,3 @@ model.save('LSTM.h5')
 
 from tensorflow import keras
 model = keras.models.load_model('LSTM.h5')
-
-arr = []
-def preprocess(text):
-    # removing url links
-    func = lambda x: re.sub(r'http\S+', '', x)
-    text = func(text)
-    arr.append(text)
-    # removing new lines and tabs
-    func = lambda x: re.sub(r"[\t\r]+", '', x)
-    text = func(text)
-    arr.append(text)
-    # removing @mention
-    func = lambda x: re.sub(r'@[\w]*', '', x)
-    text = func(text)
-    arr.append(text)
-    # removing all special characters
-    func = lambda x: re.sub(r"[`'''`,~,!,@,#,$,%,^,&,*,(,),_,-,+,=,{,[,},},|,\,:,;,\",',<,,,>,.,?,/'''`\n।]", '', x)
-    text = func(text)
-    arr.append(text)
-    # removing emojis
-    emoji_pattern = re.compile("["
-                               u"\U0001F600-\U0001F64F"  # emoticons
-                               u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                               u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                               u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                               u"\U00002500-\U00002BEF"  # chinese char
-                               u"\U00002702-\U000027B0"
-                               u"\U00002702-\U000027B0"
-                               u"\U000024C2-\U0001F251"
-                               u"\U0001f926-\U0001f937"
-                               u"\U00010000-\U0010ffff"
-                               u"\u2640-\u2642"
-                               u"\u2600-\u2B55"
-                               u"\u200d"
-                               u"\u23cf"
-                               u"\u23e9"
-                               u"\u231a"
-                               u"\ufe0f"  # dingbats
-                               u"\u3030"
-                               "]+", flags=re.UNICODE)
-    func = lambda x: emoji_pattern.sub(r'', x)
-    text = func(text)
-    arr.append(text)
-    # removing all remaining characters that aren't hindi devanagari characters or white space
-    func = lambda x: re.sub(r"[^ऀ-ॿ\s]", '', x)
-    text = func(text)
-    arr.append(text)
-    # removing stopwords
-    stopwords = gen_stopword()
-    func = lambda x: ' '.join([word for word in x.split() if word not in (stopwords)])
-    text = func(text)
-    arr.append(text)
-    # tokenization
-    func = lambda x: x.split(' ')
-    text = func(text)
-    arr.append(text)
-    # lemmatization
-    func = lambda x: [hi_lemma(y) for y in x]
-    text = func(text)
-    arr.append(text)
-    # remove repeated tokens
-    func = lambda x: list(OrderedDict.fromkeys(x))
-    text = func(text)
-    arr.append(text)
-    # generating clean sentence
-    sentence = ' '.join(r for r in text)
-    arr.append(sentence)
-    return sentence
-
-text = """"""
-print("Original Text: ",text,end='\n\n')
-text = [preprocess(text)]
-for i in arr:
-    print(i,end='\n\n')
-text = tfidf.transform(text)
-print(text)
-
-Rf = pickle.load(open("RandomForest_toxic.sav",'rb'))
-sc1 = (Rf.predict_proba(text)[0][1])*100
-Rf = pickle.load(open("RandomForest_insult.sav",'rb'))
-sc2 = (Rf.predict_proba(text)[0][1])*100
-Rf = pickle.load(open("RandomForest_obscene.sav",'rb'))
-sc3 = (Rf.predict_proba(text)[0][1])*100
-Rf = pickle.load(open("RandomForest_severe_toxic.sav",'rb'))
-sc4 = (Rf.predict_proba(text)[0][1])*100
-Rf = pickle.load(open("RandomForest_threat.sav",'rb'))
-sc5 = (Rf.predict_proba(text)[0][1])*100
-print(sc1,sc2,sc3,sc4,sc5)
-
-from tensorflow import keras
-text = ['मैं आप मूर्खता स्तर हैरान है']
-text = tokenizer.texts_to_sequences(text)
-print(text)
-text = pad_sequences(text, maxlen=max_length, padding="pre", truncating="pre")
-print(text)
-model = keras.models.load_model('LSTM.h5')
-scores = model.predict(text)
-print(scores[0][0]*100)
