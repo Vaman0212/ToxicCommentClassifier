@@ -57,10 +57,10 @@ def my_tokenizer(s):
 nlp = stanfordnlp.Pipeline(processors='tokenize,lemma',lang="hi")
 # load vectorizer
 tfidf = pickle.load(open("tfidf.pkl","rb"))
-# load models
-Rf_mild = pickle.load(open("RandomForest_mild.sav","rb"))
-Rf_moderate = pickle.load(open("RandomForest_moderate.sav","rb"))
-Rf_severe = pickle.load(open("RandomForest_severe.sav","rb"))
+ctvec = pickle.load(open("vectorizer.pkl","rb"))
+# Load RFC models
+Rfc_t = pickle.load(open("RandomForestT.sav","rb"))
+Rfc_c = pickle.load(open("RandomForestC.sav","rb"))
 # Tokenizer
 tokenizer = pickle.load(open('tokenizer.pkl','rb'))
 # LSTM
@@ -143,19 +143,19 @@ def result():
         comment = request.form["comment"]
         text = [preprocess(comment)]
         text1 = tfidf.transform(text)
-        text2 = tokenizer.texts_to_sequences(text)
-        text = pad_sequences(text2, maxlen=80, padding="pre", truncating="pre")
+        text2 = ctvec.transform(text)
+        text3 = tokenizer.texts_to_sequences(text)
+        text3 = pad_sequences(text3, maxlen=80, padding="pre", truncating="pre")
         score = []
-        score_value = round((Rf_mild.predict_proba(text1)[0][1])*100,2)
-        score.append(score_value)
-        score_value = round((Rf_moderate.predict_proba(text1)[0][1])*100,2)
-        score.append(score_value)
-        score_value = round((Rf_severe.predict_proba(text1)[0][1])*100,2)
-        score.append(score_value)
-        score_value = model.predict(text)
+        score_value = Rfc_t.predict_proba(text1)
+        for i in range(3):
+            score.append(round(score_value[i][0][1]*100,1))
+        score_value = Rfc_c.predict_proba(text2)
+        for i in range(3):
+            score.append(round(score_value[i][0][1]*100,1))
+        score_value = model.predict(text3)
         for i in range(3):
             score.append(round(score_value[0][i]*100,1))
-
 
         return render_template('results.html', text=comment, score=score)
 

@@ -3,19 +3,22 @@
 <style>
   .h-title {
     text-align: center;
-    margin-top: 10rem;
+    margin-top: 7rem;
   }
 </style>
 {% endblock %} {% block content %}
 
-<div class="container w-50">
+<div class="container w-75">
   <h3 class="h-title">Is your comment toxic?</h3>
-  <textarea class="form-control my-3" rows="4" readonly>{{ text }}</textarea>
+  <textarea class="form-control my-3 w-50 mx-auto" rows="4" readonly>
+{{ text }}</textarea
+  >
   <br />
   <div class="container">
     <table class="table table-bordered table-striped table-hover">
       <tr>
-        <th colspan="2" class="text-center">RFC Results</th>
+        <th colspan="2" class="text-center">RFC-TFIDF Results</th>
+        <th colspan="2" class="text-center">RFC-CTVEC Results</th>
         <th colspan="2" class="text-center">LSTM Results</th>
       </tr>
       <tr>
@@ -23,18 +26,24 @@
         <td>{{ score.2 }}%</td>
         <td>Severe Toxic</td>
         <td>{{ score.5 }}%</td>
+        <td>Severe Toxic</td>
+        <td>{{ score.8 }}%</td>
       </tr>
       <tr>
         <td>Moderate Toxic</td>
         <td>{{ score.1 }}%</td>
         <td>Moderate Toxic</td>
         <td>{{ score.4 }}%</td>
+        <td>Moderate Toxic</td>
+        <td>{{ score.7 }}%</td>
       </tr>
       <tr>
         <td>Mild Toxic</td>
         <td>{{ score.0 }}%</td>
         <td>Mild Toxic</td>
         <td>{{ score.3 }}%</td>
+        <td>Mild Toxic</td>
+        <td>{{ score.6 }}%</td>
       </tr>
     </table>
   </div>
